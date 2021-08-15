@@ -1,26 +1,45 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import {GlobalHotKeys, HotKeys} from "react-hotkeys";
+import {getMapping} from "./PlayingAudioHandlers";
+import {PlayingAudio} from "./PlayingAudio";
+import {VolumeRepository} from "./VolumeRepository";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+interface State {
+}
+
+class App extends React.Component<{}, State> {
+    public readonly state: State = {}
+    private playingAudio: PlayingAudio | null = null
+    private readonly volumeRepository = new VolumeRepository()
+
+    public render() {
+        const {keyMap, handlers} = getMapping((): PlayingAudio | null => this.playingAudio)
+
+        return (
+            <div>
+                <form>
+                    <input type="text" title="Найти"/>
+                </form>
+                <HotKeys keyMap={keyMap} handlers={handlers}>
+                    <h1>Музыка</h1>
+                                        <div>
+                        <ul style={{listStyleType: 'none'}}>
+                            <li onClick={this.clickHandler.bind(this)}>abc</li>
+                        </ul>
+                    </div>
+                </HotKeys>
+            </div>
+        );
+    }
+
+    private clickHandler(): void {
+        if (null === this.playingAudio) {
+            this.playingAudio = new PlayingAudio('/audio.mp3', this.volumeRepository)
+        }
+
+        this.playingAudio.toggle()
+    }
 }
 
 export default App;
